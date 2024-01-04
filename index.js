@@ -27,7 +27,8 @@ async function updateEcsService(ecs, clusterName, service, taskDefArn, waitForSe
     cluster: clusterName,
     service: service,
     taskDefinition: taskDefArn,
-    forceNewDeployment: forceNewDeployment
+    forceNewDeployment: forceNewDeployment,
+    enableExecuteCommand: true, // Always enable execute command in the service definition
   }).promise();
 
   const consoleHostname = aws.config.region.startsWith('cn') ? 'console.amazonaws.cn' : 'console.aws.amazon.com';
