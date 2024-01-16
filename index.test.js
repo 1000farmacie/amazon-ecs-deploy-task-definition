@@ -187,7 +187,8 @@ describe('Deploy to ECS', () => {
         cluster: 'cluster-789',
         service: 'service-456',
         taskDefinition: 'task:def:arn',
-        forceNewDeployment: false
+        forceNewDeployment: false,
+        enableExecuteCommand: true
       });
       expect(mockEcsWaiter).toHaveBeenCalledTimes(0);
       expect(core.info).toBeCalledWith("Deployment started. Watch this deployment's progress in the Amazon ECS console: https://console.aws.amazon.com/ecs/home?region=fake-region#/clusters/cluster-789/services/service-456/events");
@@ -234,7 +235,8 @@ describe('Deploy to ECS', () => {
             cluster: 'cluster-789',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: false
+            forceNewDeployment: false,
+            enableExecuteCommand: true
         });
         expect(mockEcsWaiter).toHaveBeenCalledTimes(0);
         expect(core.info).toBeCalledWith("Deployment started. Watch this deployment's progress in the Amazon ECS console: https://console.aws.amazon.com/ecs/home?region=fake-region#/clusters/cluster-789/services/service-456/events");
@@ -269,7 +271,8 @@ describe('Deploy to ECS', () => {
             cluster: 'cluster-789',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: false
+            forceNewDeployment: false,
+            enableExecuteCommand: true
         });
         expect(mockEcsWaiter).toHaveBeenCalledTimes(0);
         expect(core.info).toBeCalledWith("Deployment started. Watch this deployment's progress in the Amazon ECS console: https://console.aws.amazon.com/ecs/home?region=fake-region#/clusters/cluster-789/services/service-456/events");
@@ -999,7 +1002,8 @@ describe('Deploy to ECS', () => {
             cluster: 'cluster-789',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: false
+            forceNewDeployment: false,
+            enableExecuteCommand: true
         });
         expect(mockEcsWaiter).toHaveBeenNthCalledWith(1, 'servicesStable', {
             services: ['service-456'],
@@ -1033,7 +1037,8 @@ describe('Deploy to ECS', () => {
             cluster: 'cluster-789',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: false
+            forceNewDeployment: false,
+            enableExecuteCommand: true
         });
         expect(mockEcsWaiter).toHaveBeenNthCalledWith(1, 'servicesStable', {
             services: ['service-456'],
@@ -1067,7 +1072,8 @@ describe('Deploy to ECS', () => {
             cluster: 'cluster-789',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: false
+            forceNewDeployment: false,
+            enableExecuteCommand: true
         });
         expect(mockEcsWaiter).toHaveBeenNthCalledWith(1, 'servicesStable', {
             services: ['service-456'],
@@ -1102,7 +1108,8 @@ describe('Deploy to ECS', () => {
             cluster: 'cluster-789',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: true
+            forceNewDeployment: true,
+            enableExecuteCommand: true
         });
     });
 
@@ -1131,7 +1138,8 @@ describe('Deploy to ECS', () => {
             service: 'service-456',
             taskDefinition: 'task:def:arn',
             forceNewDeployment: true,
-            desiredCount: 0
+            desiredCount: 0,
+            enableExecuteCommand: true
         });
     });
 
@@ -1154,7 +1162,8 @@ describe('Deploy to ECS', () => {
             cluster: 'default',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: false
+            forceNewDeployment: false,
+            enableExecuteCommand: true
         });
     });
 
