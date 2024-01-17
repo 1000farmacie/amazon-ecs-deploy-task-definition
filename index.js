@@ -21,7 +21,7 @@ const IGNORED_TASK_DEFINITION_ATTRIBUTES = [
 ];
 
 // Deploy to a service that uses the 'ECS' deployment controller
-async function updateEcsService(ecs, clusterName, service, taskDefArn, waitForService, waitForMinutes, forceNewDeployment) {
+async function updateEcsService(ecs, clusterName, service, taskDefArn, waitForService, waitForMinutes, forceNewDeployment, desiredCount = null) {
   core.debug('Updating the service');
   await ecs.updateService({
     cluster: clusterName,
@@ -29,6 +29,7 @@ async function updateEcsService(ecs, clusterName, service, taskDefArn, waitForSe
     taskDefinition: taskDefArn,
     forceNewDeployment: forceNewDeployment,
     enableExecuteCommand: true, // Always enable execute command in the service definition
+    ...(desiredCount !== null && { desiredCount: desiredCount }),
   }).promise();
 
   const consoleHostname = aws.config.region.startsWith('cn') ? 'console.amazonaws.cn' : 'console.aws.amazon.com';
@@ -270,6 +271,9 @@ async function run() {
     const forceNewDeployInput = core.getInput('force-new-deployment', { required: false }) || 'false';
     const forceNewDeployment = forceNewDeployInput.toLowerCase() === 'true';
 
+    const desiredCountInput = core.getInput('desired-count', { required: false });
+    const desiredCount = desiredCountInput !== null && desiredCountInput !== undefined ? parseInt(desiredCountInput) : null;
+
     const taskDefPath = path.isAbsolute(taskDefinitionFile) ?
         taskDefinitionFile :
         path.join(process.env.GITHUB_WORKSPACE, taskDefinitionFile);
@@ -338,7 +342,7 @@ async function run() {
 
       if (!serviceResponse.deploymentController || !serviceResponse.deploymentController.type || serviceResponse.deploymentController.type === 'ECS') {
         // Service uses the 'ECS' deployment controller, so we can call UpdateService
-        await updateEcsService(ecs, clusterName, service, taskDefArn, waitForService, waitForMinutes, forceNewDeployment);
+        await updateEcsService(ecs, clusterName, service, taskDefArn, waitForService, waitForMinutes, forceNewDeployment, desiredCount);
       } else if (serviceResponse.deploymentController.type === 'CODE_DEPLOY') {
         // Service uses CodeDeploy, so we should start a CodeDeploy deployment
         await createCodeDeployDeployment(codedeploy, clusterName, service, taskDefArn, waitForService, waitForMinutes);

@@ -169,7 +169,7 @@ describe('Deploy to ECS', () => {
         .fn()
         .mockReturnValueOnce('task-def-family')
         .mockReturnValueOnce('service-456')
-        .mockReturnValueOnce('cluster-789'); 
+        .mockReturnValueOnce('cluster-789');
 
       await run();
 
@@ -187,7 +187,8 @@ describe('Deploy to ECS', () => {
         cluster: 'cluster-789',
         service: 'service-456',
         taskDefinition: 'task:def:arn',
-        forceNewDeployment: false
+        forceNewDeployment: false,
+        enableExecuteCommand: true
       });
       expect(mockEcsWaiter).toHaveBeenCalledTimes(0);
       expect(core.info).toBeCalledWith("Deployment started. Watch this deployment's progress in the Amazon ECS console: https://console.aws.amazon.com/ecs/home?region=fake-region#/clusters/cluster-789/services/service-456/events");
@@ -195,12 +196,12 @@ describe('Deploy to ECS', () => {
 
     test("should be able to throw an error when the task definition family is not found", async () => {
       fs.existsSync.mockReturnValueOnce(false);
-      
+
       core.getInput = jest
         .fn()
         .mockReturnValueOnce('task-def-family')
         .mockReturnValueOnce('service-456')
-        .mockReturnValueOnce('cluster-789'); 
+        .mockReturnValueOnce('cluster-789');
 
       mockEcsDescribeTaskDef.mockImplementation(() => {
         return {
@@ -234,7 +235,8 @@ describe('Deploy to ECS', () => {
             cluster: 'cluster-789',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: false
+            forceNewDeployment: false,
+            enableExecuteCommand: true
         });
         expect(mockEcsWaiter).toHaveBeenCalledTimes(0);
         expect(core.info).toBeCalledWith("Deployment started. Watch this deployment's progress in the Amazon ECS console: https://console.aws.amazon.com/ecs/home?region=fake-region#/clusters/cluster-789/services/service-456/events");
@@ -269,7 +271,8 @@ describe('Deploy to ECS', () => {
             cluster: 'cluster-789',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: false
+            forceNewDeployment: false,
+            enableExecuteCommand: true
         });
         expect(mockEcsWaiter).toHaveBeenCalledTimes(0);
         expect(core.info).toBeCalledWith("Deployment started. Watch this deployment's progress in the Amazon ECS console: https://console.aws.amazon.com/ecs/home?region=fake-region#/clusters/cluster-789/services/service-456/events");
@@ -999,7 +1002,8 @@ describe('Deploy to ECS', () => {
             cluster: 'cluster-789',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: false
+            forceNewDeployment: false,
+            enableExecuteCommand: true
         });
         expect(mockEcsWaiter).toHaveBeenNthCalledWith(1, 'servicesStable', {
             services: ['service-456'],
@@ -1033,7 +1037,8 @@ describe('Deploy to ECS', () => {
             cluster: 'cluster-789',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: false
+            forceNewDeployment: false,
+            enableExecuteCommand: true
         });
         expect(mockEcsWaiter).toHaveBeenNthCalledWith(1, 'servicesStable', {
             services: ['service-456'],
@@ -1067,7 +1072,8 @@ describe('Deploy to ECS', () => {
             cluster: 'cluster-789',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: false
+            forceNewDeployment: false,
+            enableExecuteCommand: true
         });
         expect(mockEcsWaiter).toHaveBeenNthCalledWith(1, 'servicesStable', {
             services: ['service-456'],
@@ -1102,7 +1108,38 @@ describe('Deploy to ECS', () => {
             cluster: 'cluster-789',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: true
+            forceNewDeployment: true,
+            enableExecuteCommand: true
+        });
+    });
+
+    test('scale the service to zero', async () => {
+        core.getInput = jest
+            .fn()
+            .mockReturnValueOnce('task-definition.json')  // task-definition
+            .mockReturnValueOnce('service-456')          // service
+            .mockReturnValueOnce('cluster-789')          // cluster
+            .mockReturnValueOnce('false')                // wait-for-service-stability
+            .mockReturnValueOnce('')                     // wait-for-minutes
+            .mockReturnValueOnce('true')                  // force-new-deployment
+            .mockReturnValueOnce(0);                  // desired-count
+
+        await run();
+        expect(core.setFailed).toHaveBeenCalledTimes(0);
+
+        expect(mockEcsRegisterTaskDef).toHaveBeenNthCalledWith(1, { family: 'task-def-family'});
+        expect(core.setOutput).toHaveBeenNthCalledWith(1, 'task-definition-arn', 'task:def:arn');
+        expect(mockEcsDescribeServices).toHaveBeenNthCalledWith(1, {
+            cluster: 'cluster-789',
+            services: ['service-456']
+        });
+        expect(mockEcsUpdateService).toHaveBeenNthCalledWith(1, {
+            cluster: 'cluster-789',
+            service: 'service-456',
+            taskDefinition: 'task:def:arn',
+            forceNewDeployment: true,
+            desiredCount: 0,
+            enableExecuteCommand: true
         });
     });
 
@@ -1125,7 +1162,8 @@ describe('Deploy to ECS', () => {
             cluster: 'default',
             service: 'service-456',
             taskDefinition: 'task:def:arn',
-            forceNewDeployment: false
+            forceNewDeployment: false,
+            enableExecuteCommand: true
         });
     });
 
